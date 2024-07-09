@@ -62,7 +62,7 @@ else:
         model_name = f"{exp_name}_{checkpoint_id}"
     else:
         model_name = last_str                       # mainly for base model
-
+        exp_name = last_str
 # ============= Load previous results if exists =============
 result_path = f"./data/{args.bench_name}/model_answer/{model_name}.json"
 

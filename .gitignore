@@ -4,7 +4,7 @@ training_scripts/*
 
 evaluation/open_ended/data/*/model_answer/*
 evaluation/open_ended/data/*/model_judgment/*
-
+*.out
 debug.py
 
 output/

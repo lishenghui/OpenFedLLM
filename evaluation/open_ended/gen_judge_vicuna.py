@@ -2,24 +2,22 @@ import argparse
 import re
 import json
 import openai
-from openai.error import (
-    RateLimitError,
-    InvalidRequestError,
-    Timeout,
-    APIConnectionError,
-    ServiceUnavailableError,
-    APIError
-)
+from openai import OpenAI
+
+
 import os
 import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_answer", type=str, default=None, help="file name")
-parser.add_argument("--judger", type=str, default='gpt-4')
+parser.add_argument("--judger", type=str, default='gpt-4o-2024-05-13')
 args = parser.parse_args()
 
 response_path = f"./data/vicuna/model_answer/{args.model_answer}.json"
 save_path = "./data/vicuna/model_judgment/{judger}_{exp_name}.json".format(judger=args.judger, exp_name=args.model_answer)
+
+
+client = OpenAI()
 
 # ============= Load the model outputs =============
 with open(response_path) as f:
@@ -47,30 +45,30 @@ def completion(messages, args):
     success = False
     while not success:
         try:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                     model=args.judger,
                     messages=messages,
                     temperature=0.2,
                     max_tokens=2048,
                 )
             success = True
-        except RateLimitError as e:
+        except openai.RateLimitError as e:
             print(e)
             retry_time = get_retry_time(str(e))
             time.sleep(retry_time)
-        except Timeout as e:
+        except openai.APITimeoutError as e:
             print(e)
             time.sleep(1)
-        except APIConnectionError as e:
+        except openai.APIConnectionError as e:
             print(e)
             time.sleep(1)
-        except APIError as e:
+        except openai.APIError as e:
             print(e)
             time.sleep(1)
-        except ServiceUnavailableError as e:
-            print(e)
-            time.sleep(1)
-        except InvalidRequestError as e:
+        # except openai.ServiceUnavailableError as e:
+        #     print(e)
+        #     time.sleep(1)
+        except openai.BadRequestError as e:
             print(e)
             success = True
             response = {"choices": []}
@@ -94,11 +92,14 @@ for output in model_outputs:
         {"role": "user", "content": f"{current_prompt}"}
     ]
 
-    response = completion(messages, args)
+    response = client.chat.completions.create(
+        model="gpt-4o-2024-05-13",  # Ensure this matches an available model
+        messages=messages
+    )
 
     record_sample = {}
     record_sample["for_judge"] = current_prompt
-    record_sample["response"] = response["choices"][0]["message"]["content"]
+    record_sample["response"] = response.choices[0].message.content
 
     judge_list.append(record_sample)
 

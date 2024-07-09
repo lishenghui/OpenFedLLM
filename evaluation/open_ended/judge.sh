@@ -1,0 +1,1 @@
+python gen_judge_vicuna.py --model_answer alpaca-gpt4_20000_fedavg_c20s2_i10_b16a1_l512_r32a64_20240710000916_10 --judger gpt-4

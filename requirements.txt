@@ -12,7 +12,6 @@ cmake==3.27.2
 contourpy==1.1.1
 cycler==0.12.1
 datasets==2.13.0
-deepspeed==0.13.1
 dill==0.3.6
 docstring-parser==0.15
 filelock==3.12.3
@@ -90,3 +89,4 @@ urllib3==2.0.4
 wcwidth==0.2.6
 xxhash==3.3.0
 yarl==1.9.2
+deepspeed==0.13.1
